@@ -1,7 +1,6 @@
 aiohappyeyeballs==2.6.1
 aiohttp==3.13.2
 aiosignal==1.4.0
-altgraph==0.17.5
 annotated-types==0.7.0
 anyio==4.10.0
 arabic-reshaper==3.0.0
@@ -17,13 +16,10 @@ cffi==2.0.0
 charset-normalizer==3.4.4
 ckzg==2.1.5
 click==8.2.1
-colorama==0.4.6
 contourpy==1.3.3
 cryptography==46.0.3
-customtkinter==5.2.2
 cycler==0.12.1
 cytoolz==1.1.0
-darkdetect==0.8.0
 distro==1.9.0
 dnspython==2.8.0
 ecdsa==0.19.1
@@ -69,7 +65,6 @@ lxml==6.0.2
 MarkupSafe==3.0.3
 matplotlib==3.10.7
 multidict==6.7.0
-Nuitka==2.8.9
 numpy==2.3.5
 openai==2.14.0
 openpyxl==3.1.5
@@ -78,8 +73,6 @@ packaging==25.0
 pandas==3.0.0
 parsimonious==0.10.0
 passlib==1.7.4
-pefile==2024.8.26
-pillow==12.0.0
 pluggy==1.6.0
 propcache==0.4.1
 proto-plus==1.27.0
@@ -92,8 +85,6 @@ pycryptodome==3.23.0
 pydantic==2.11.9
 pydantic_core==2.33.2
 Pygments==2.19.2
-pyinstaller==6.17.0
-pyinstaller-hooks-contrib==2025.11
 pyparsing==3.2.5
 PyPDF2==3.0.1
 pytest==9.0.2
@@ -104,10 +95,6 @@ python-dotenv==1.0.1
 python-jose==3.5.0
 python-multipart==0.0.21
 pyunormalize==17.0.0
-pywin32==311
-pywin32-ctypes==0.2.3
-PyYAML==6.0.2
-regex==2025.11.3
 reportlab==4.4.9
 requests==2.32.5
 rlp==4.1.0
