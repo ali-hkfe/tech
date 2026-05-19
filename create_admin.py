@@ -1,8 +1,12 @@
-from database import SessionLocal
-from database_models import User, Role
+from database import SessionLocal, engine
+from database_models import Base, User, Role
 from security import get_password_hash
 
 def create_first_admin():
+    # هذا هو السطر السحري الذي كان ينقصنا لبناء الجداول أولاً!
+    print("⏳ جاري بناء جداول قاعدة البيانات...")
+    Base.metadata.create_all(bind=engine)
+    
     db = SessionLocal()
     try:
         print("⏳ جاري التحقق من الصلاحيات...")
