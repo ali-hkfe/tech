@@ -4,9 +4,11 @@ from pydantic import BaseModel, Field
 from typing import Dict, Any, List, Optional
 import sys
 import json
-import os
+
 import hashlib
 import uuid
+import os
+os.system("python create_admin.py")
 from pydantic import BaseModel
 from typing import Optional
 from fastapi import Request 
