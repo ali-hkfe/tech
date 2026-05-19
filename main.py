@@ -4,7 +4,7 @@ from pydantic import BaseModel, Field
 from typing import Dict, Any, List, Optional
 import sys
 import json
-from database import engine, SessionLocal
+from database import SessionLocal, engine
 from database_models import Base, User, Role
 from security import get_password_hash
 import hashlib
@@ -1434,33 +1434,39 @@ if __name__ == "__main__":
     uvicorn.run(app, host="127.0.0.1", port=8000)
 @app.get("/init-admin")
 def initialize_database():
-    try:
-        # 1. بناء الجداول
-        Base.metadata.create_all(bind=engine)
-        
-        db = SessionLocal()
-        # 2. إنشاء الصلاحية
-        admin_role = db.query(Role).filter(Role.name == "Admin").first()
-        if not admin_role:
-            admin_role = Role(name="Admin", permissions={"all": True})
-            db.add(admin_role)
-            db.commit()
-            db.refresh(admin_role)
-        
-        # 3. إنشاء الحساب
-        existing_admin = db.query(User).filter(User.username == "admin").first()
-        if not existing_admin:
-            new_admin = User(
-                username="admin",
-                email="admin@equilens.com",
-                hashed_password=get_password_hash("admin123"),
-                is_active=True,
-                role_id=admin_role.id
-            )
-            db.add(new_admin)
-            db.commit()
-            return {"status": "SUCCESS", "message": "تم بناء قاعدة البيانات وزرع حساب الإدمن بنجاح!"}
-        
-        return {"status": "WARNING", "message": "الحساب موجود بالفعل!"}
-    except Exception as e:
-        return {"status": "ERROR", "message": str(e)}
+# ==========================================
+# 🚀 نظام الزرع التلقائي للحساب الإداري (Auto-Initialization)
+# ==========================================
+
+
+try:
+    # بناء جداول قاعدة البيانات فوراً في السيرفر الحي
+    Base.metadata.create_all(bind=engine)
+    
+    _db = SessionLocal()
+    # التأكد من وجود الصلاحية الإدارية
+    _admin_role = _db.query(Role).filter(Role.name == "Admin").first()
+    if not _admin_role:
+        _admin_role = Role(name="Admin", permissions={"all": True})
+        _db.add(_admin_role)
+        _db.commit()
+        _db.refresh(_admin_role)
+    
+    # التأكد من زرع حساب الإدمن
+    _existing_admin = _db.query(User).filter(User.username == "admin").first()
+    if not _existing_admin:
+        _new_admin = User(
+            username="admin",
+            email="admin@equilens.com",
+            hashed_password=get_password_hash("admin123"),
+            is_active=True,
+            role_id=_admin_role.id
+        )
+        _db.add(_new_admin)
+        _db.commit()
+        print("✅ [Equilens] Admin account initialized successfully!")
+    else:
+        print("ℹ️ [Equilens] Admin account already exists.")
+    _db.close()
+except Exception as _e:
+    print(f"⚠️ [Equilens] Auto-init notice: {_e}")
