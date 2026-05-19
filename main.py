@@ -4,7 +4,9 @@ from pydantic import BaseModel, Field
 from typing import Dict, Any, List, Optional
 import sys
 import json
-
+from database import engine, SessionLocal
+from database_models import Base, User, Role
+from security import get_password_hash
 import hashlib
 import uuid
 import os
@@ -1430,3 +1432,35 @@ async def save_to_archive(request: Request):
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="127.0.0.1", port=8000)
+@app.get("/init-admin")
+def initialize_database():
+    try:
+        # 1. بناء الجداول
+        Base.metadata.create_all(bind=engine)
+        
+        db = SessionLocal()
+        # 2. إنشاء الصلاحية
+        admin_role = db.query(Role).filter(Role.name == "Admin").first()
+        if not admin_role:
+            admin_role = Role(name="Admin", permissions={"all": True})
+            db.add(admin_role)
+            db.commit()
+            db.refresh(admin_role)
+        
+        # 3. إنشاء الحساب
+        existing_admin = db.query(User).filter(User.username == "admin").first()
+        if not existing_admin:
+            new_admin = User(
+                username="admin",
+                email="admin@equilens.com",
+                hashed_password=get_password_hash("admin123"),
+                is_active=True,
+                role_id=admin_role.id
+            )
+            db.add(new_admin)
+            db.commit()
+            return {"status": "SUCCESS", "message": "تم بناء قاعدة البيانات وزرع حساب الإدمن بنجاح!"}
+        
+        return {"status": "WARNING", "message": "الحساب موجود بالفعل!"}
+    except Exception as e:
+        return {"status": "ERROR", "message": str(e)}
