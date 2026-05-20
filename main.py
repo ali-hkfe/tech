@@ -1430,6 +1430,46 @@ if __name__ == "__main__":
     
     # جلب المنفذ الديناميكي المخصص من منصة Railway تلقائياً
     port = int(os.environ.get("PORT", 8000))
-    
+    # ==========================================
+# 🚀 رابط الحقن المباشر لقاعدة البيانات
+# ==========================================
+@app.get("/force-admin")
+def force_admin_creation():
+    try:
+        from database import SessionLocal, engine
+        from database_models import Base, User, Role
+        from security import get_password_hash
+        
+        # بناء الجداول في قاعدة Postgres
+        Base.metadata.create_all(bind=engine)
+        db = SessionLocal()
+        
+        # حقن الصلاحية
+        admin_role = db.query(Role).filter(Role.name == "Admin").first()
+        if not admin_role:
+            admin_role = Role(name="Admin", permissions={"all": True})
+            db.add(admin_role)
+            db.commit()
+            db.refresh(admin_role)
+            
+        # حقن الحساب
+        admin = db.query(User).filter(User.username == "admin").first()
+        if not admin:
+            new_admin = User(
+                username="admin",
+                email="admin@equilens.com",
+                hashed_password=get_password_hash("admin123"),
+                is_active=True,
+                role_id=admin_role.id
+            )
+            db.add(new_admin)
+            db.commit()
+            db.close()
+            return {"status": "SUCCESS", "message": "✅ تم حقن الحساب الإداري في قاعدة البيانات بنجاح! اذهب وسجل دخولك الآن."}
+        
+        db.close()
+        return {"status": "EXISTS", "message": "ℹ️ الحساب موجود بالفعل ومفتاحه هو admin123"}
+    except Exception as e:
+        return {"status": "ERROR", "message": f"حدث خطأ: {str(e)}"}
     # تشغيل المحرك وعرضه للعالم الخارجي عبر 0.0.0.0
     uvicorn.run(app, host="0.0.0.0", port=port)
