@@ -1426,5 +1426,9 @@ async def save_to_archive(request: Request):
         print(f"❌ Error saving to archive: {str(e)}")
         return {"status": "error", "message": str(e)}
 if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="127.0.0.1", port=8000)
+    
+    # جلب المنفذ الديناميكي المخصص من منصة Railway تلقائياً
+    port = int(os.environ.get("PORT", 8000))
+    
+    # تشغيل المحرك وعرضه للعالم الخارجي عبر 0.0.0.0
+    uvicorn.run(app, host="0.0.0.0", port=port)
