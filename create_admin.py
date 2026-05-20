@@ -34,5 +34,6 @@ def initialize_admin_on_startup():
         else:
             print("ℹ️ [Equilens] Admin account already exists.")
         db.close()
+        os
     except Exception as e:
         print(f"⚠️ [Equilens] Startup Error: {e}")
