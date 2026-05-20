@@ -5,6 +5,7 @@ from typing import Dict, Any, List, Optional
 import sys
 import json
 import os
+import uvicorn
 import hashlib
 import uuid
 from pydantic import BaseModel
