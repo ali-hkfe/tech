@@ -1468,6 +1468,12 @@ def force_admin_creation():
         return {"status": "EXISTS", "message": "ℹ️ الحساب موجود بالفعل ومفتاحه هو admin123"}
     except Exception as e:
         return {"status": "ERROR", "message": f"حدث خطأ: {str(e)}"}
+        # تشغيل ملف الزرع الخارجي إجبارياً عند إقلاع السيرفر
+try:
+    import create_admin
+    create_admin.create_first_admin()
+except Exception as e:
+    print(f"⚠️ لم يتم الزرع بسبب: {e}")
     if __name__ == "__main__":
     
     # جلب المنفذ الديناميكي المخصص من منصة Railway تلقائياً
