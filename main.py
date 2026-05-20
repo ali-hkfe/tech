@@ -54,20 +54,14 @@ class ArchiveSaveRequest(BaseModel):
 current_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(current_dir, "data_sources"))
 sys.path.append(os.path.join(current_dir, "intelligence"))
-
+# ==========================================
+# 💾 إعداد قاعدة البيانات (السحابية)
+# ==========================================
+from database import engine, SessionLocal, get_db
+Base.metadata.create_all(bind=engine)
 # ==========================================
 # 💾 إعداد قاعدة البيانات 
 # ==========================================
-SQLALCHEMY_DATABASE_URL = "sqlite:///./equilens_v2.db"
-engine = create_engine(SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False})
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
-Base.metadata.create_all(bind=engine)
-
-def get_db():
-    db = SessionLocal()
-    try: yield db
-    finally: db.close()
 
 # ==========================================
 # 🚀 بدء التطبيق
@@ -989,7 +983,7 @@ async def generate_national_power(payload: dict):
         # 🌟 1. فلتر الأمان: تصحيح الموديل المرفوض
         raw_model_name = payload.get("model", "gemini-1.5-flash-latest")
 # 🌟 التصحيح الحاسم: استخدام الجيل الثاني المتاح في مفتاحك
-        safe_model_name = "gemini-3.1-flash-lite-preview" if "flash" in raw_model.lower() else "gemini-pro-latest"
+        safe_model_name = "gemini-3.1-flash-lite-preview" if "flash" in raw_model_name.lower() else "gemini-pro-latest"
         # سحب البيانات القادمة من الواجهة
         inputs = payload.get("inputs", {})
         score = payload.get("score")
@@ -1467,14 +1461,17 @@ def force_admin_creation():
     except Exception as e:
         return {"status": "ERROR", "message": f"حدث خطأ: {str(e)}"}
         # تشغيل ملف الزرع الخارجي إجبارياً عند إقلاع السيرفر
+# تشغيل ملف الزرع الخارجي إجبارياً عند إقلاع السيرفر
 try:
     import create_admin
     create_admin.create_first_admin()
 except Exception as e:
     print(f"⚠️ لم يتم الزرع بسبب: {e}")
-    if __name__ == "__main__":
-    
+
+if __name__ == "__main__":
+    import uvicorn
+    import os
     # جلب المنفذ الديناميكي المخصص من منصة Railway تلقائياً
-    port = int(os.environ.get("PORT", 8000))
+    port = int(os.environ.get("PORT", 8080))
     # تشغيل المحرك وعرضه للعالم الخارجي عبر 0.0.0.0
     uvicorn.run(app, host="0.0.0.0", port=port)
