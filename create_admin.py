@@ -1,11 +1,10 @@
-@app.on_event("startup")
-def initialize_admin_on_startup():
-    from database import SessionLocal, engine
-    from database_models import Base, User, Role
-    from security import get_password_hash
-    
+from database import SessionLocal, engine
+from database_models import Base, User, Role
+from security import get_password_hash
+
+def create_first_admin():
+    print("⏳ [Equilens] Starting auto-initialization...")
     try:
-        print("⏳ [Equilens] Starting auto-initialization...")
         # بناء الجداول
         Base.metadata.create_all(bind=engine)
         db = SessionLocal()
@@ -17,7 +16,7 @@ def initialize_admin_on_startup():
             db.add(admin_role)
             db.commit()
             db.refresh(admin_role)
-        
+            
         # التأكد من الحساب
         existing_admin = db.query(User).filter(User.username == "admin").first()
         if not existing_admin:
@@ -34,6 +33,8 @@ def initialize_admin_on_startup():
         else:
             print("ℹ️ [Equilens] Admin account already exists.")
         db.close()
-        os
     except Exception as e:
         print(f"⚠️ [Equilens] Startup Error: {e}")
+
+if __name__ == "__main__":
+    create_first_admin()
