@@ -4,11 +4,9 @@ from pydantic import BaseModel, Field
 from typing import Dict, Any, List, Optional
 import sys
 import json
-
+import os
 import hashlib
 import uuid
-import os
-os.system("python create_admin.py")
 from pydantic import BaseModel
 from typing import Optional
 from fastapi import Request 
@@ -1430,5 +1428,3 @@ async def save_to_archive(request: Request):
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="127.0.0.1", port=8000)
-@app.get("/init-admin")
-def initialize_database():
