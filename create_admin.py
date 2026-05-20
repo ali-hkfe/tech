@@ -1,24 +1,24 @@
-from database import SessionLocal, engine
-from database_models import Base, User, Role
-from security import get_password_hash
-
-def create_first_admin():
-    # هذا هو السطر السحري الذي كان ينقصنا لبناء الجداول أولاً!
-    print("⏳ جاري بناء جداول قاعدة البيانات...")
-    Base.metadata.create_all(bind=engine)
+@app.on_event("startup")
+def initialize_admin_on_startup():
+    from database import SessionLocal, engine
+    from database_models import Base, User, Role
+    from security import get_password_hash
     
-    db = SessionLocal()
     try:
-        print("⏳ جاري التحقق من الصلاحيات...")
+        print("⏳ [Equilens] Starting auto-initialization...")
+        # بناء الجداول
+        Base.metadata.create_all(bind=engine)
+        db = SessionLocal()
+        
+        # التأكد من الصلاحية
         admin_role = db.query(Role).filter(Role.name == "Admin").first()
         if not admin_role:
             admin_role = Role(name="Admin", permissions={"all": True})
             db.add(admin_role)
             db.commit()
             db.refresh(admin_role)
-            print("✅ تم إنشاء صلاحية Admin")
-
-        print("⏳ جاري التحقق من حساب الإدارة...")
+        
+        # التأكد من الحساب
         existing_admin = db.query(User).filter(User.username == "admin").first()
         if not existing_admin:
             new_admin = User(
@@ -30,13 +30,9 @@ def create_first_admin():
             )
             db.add(new_admin)
             db.commit()
-            print("✅ تم إنشاء حساب الإدمن بنجاح! (admin / admin123)")
+            print("✅ [Equilens] Admin account created successfully! (admin / admin123)")
         else:
-            print("⚠️ الحساب موجود بالفعل.")
-    except Exception as e:
-        print(f"❌ حدث خطأ: {e}")
-    finally:
+            print("ℹ️ [Equilens] Admin account already exists.")
         db.close()
-
-if __name__ == "__main__":
-    create_first_admin()
+    except Exception as e:
+        print(f"⚠️ [Equilens] Startup Error: {e}")
