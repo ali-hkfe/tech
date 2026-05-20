@@ -1426,10 +1426,7 @@ async def save_to_archive(request: Request):
     except Exception as e:
         print(f"❌ Error saving to archive: {str(e)}")
         return {"status": "error", "message": str(e)}
-if __name__ == "__main__":
-    
-    # جلب المنفذ الديناميكي المخصص من منصة Railway تلقائياً
-    port = int(os.environ.get("PORT", 8000))
+
     # ==========================================
 # 🚀 رابط الحقن المباشر لقاعدة البيانات
 # ==========================================
@@ -1471,5 +1468,9 @@ def force_admin_creation():
         return {"status": "EXISTS", "message": "ℹ️ الحساب موجود بالفعل ومفتاحه هو admin123"}
     except Exception as e:
         return {"status": "ERROR", "message": f"حدث خطأ: {str(e)}"}
+    if __name__ == "__main__":
+    
+    # جلب المنفذ الديناميكي المخصص من منصة Railway تلقائياً
+    port = int(os.environ.get("PORT", 8000))
     # تشغيل المحرك وعرضه للعالم الخارجي عبر 0.0.0.0
     uvicorn.run(app, host="0.0.0.0", port=port)
