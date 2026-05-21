@@ -317,9 +317,27 @@ def search_archive_news(country_iso: str, date: str = None, db: Session = Depend
 # ==========================================
 @app.post("/auth/login")
 async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
-    # 🔥 وضع الشبح (Ghost Mode): تجاوز قاعدة البيانات وإصدار تذكرة إدارة فورية!
-    token = create_access_token(data={"sub": "admin", "role": "Admin"})
-    return {"access_token": token, "token_type": "bearer", "role": "Admin"}
+    # 1. البحث عن المستخدم في قاعدة البيانات
+    user = db.query(User).filter(User.username == form_data.username).first()
+    
+    # 2. التحقق من وجود الحساب ومطابقة كلمة المرور المشفرة
+    if not user or not verify_password(form_data.password, user.hashed_password):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="اسم المستخدم أو كلمة المرور غير صحيحة",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    
+    # 3. تحديد الصلاحية (Role)
+    user_role = user.role.name if user.role else "Analyst"
+    
+    # 4. إصدار التذكرة الحقيقية والمشفرة (Token)
+    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = create_access_token(
+        data={"sub": user.username, "role": user_role}, expires_delta=access_token_expires
+    )
+    
+    return {"access_token": access_token, "token_type": "bearer", "role": user_role}
 
 @app.get("/api/admin/users")
 def get_users(db: Session = Depends(get_db)):
